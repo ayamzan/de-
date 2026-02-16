@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  pgdatabase:
+    image: postgres:18
+    container_name: ny_taxi_pg
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ny_taxi
+    volumes:
+      - ny_taxi_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - pg-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    networks:
+      - pg-network
+    depends_on:
+      - pgdatabase
+
+volumes:
+  ny_taxi_postgres_data:
+
+networks:
+  pg-network:
+    driver: bridge
